@@ -74,21 +74,44 @@ data = xml2["Report"] #資料主體
 
 title = data["Head"]["Title"] #標題
 headline = data["Head"]["Headline"]["Text"] #註解文
-earthquake = data["Body"]["Earthquake"] #地震資訊
+try:
+    earthquake = data["Body"]["Earthquake"] #震源資訊
+    loc = earthquake["Hypocenter"]["Area"]["Name"]
+    dep = earthquake["Hypocenter"]["Area"]["jmx_eb:Coordinate"]["@description"].split("深さ")[1].replace("　","").replace("ｋｍ","キロ")
+except:
+    earthquake = ""
+    loc = ""
+    dep = ""
+    print("未取得震源資訊")
 
-eventtime = data["Head"]["EventID"] #地震發生時間
-mon = eventtime[4:6]
-day = eventtime[6:8]
-hou = int(eventtime[8:10])
-min = eventtime[10:12]
+try:
+    intensity = data["Body"]["Intensity"]["Observation"] #震度資訊
+    pref = intensity["Pref"]
+    maxint = intensity["MaxInt"]
+except:
+    intensity = ""
+    pref = ""
+    maxint = ""
+    print("未取得震度資訊")
+try:
+    eventtime = earthquake["ArrivalTime"]
+    mon = eventtime[5:7]
+    day = eventtime[8:10]
+    hou = int(eventtime[11:13])
+    min = eventtime[14:16]
+except:
+    eventtime = data["Head"]["EventID"] #地震發生時間
+    mon = eventtime[4:6]
+    day = eventtime[6:8]
+    hou = int(eventtime[8:10])
+    min = eventtime[10:12]
+
 if hou > 11:
     hou -= 12
     ampm = "午後"
 else:
     ampm = "午前"
 hou = str(hou)
-
-a = [mon,day,hou,min]
 
 if mon[:1] == "0":
     mon = mon.replace("0","")
@@ -104,17 +127,6 @@ if "震源要素更新" in title:
 else:
     eventtime = f"{ampm}{hou}時{min}分頃"
 
-
-
-try:
-    intensity = data["Body"]["Intensity"]["Observation"] #震度資訊
-    pref = intensity["Pref"]
-    maxint = intensity["MaxInt"]
-except:
-    intensity = ""
-    pref = ""
-    maxint = ""
-    print("未取得震度資訊")
 
 a = 0
 b = 0
@@ -150,3 +162,5 @@ for i in pref:
         break
 
 print(eventtime)
+print(loc)
+print(dep)
