@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from asyncore import write
+from calendar import month
 from dis import code_info
 from encodings import utf_8
 import time
@@ -75,14 +76,44 @@ title = data["Head"]["Title"] #標題
 headline = data["Head"]["Headline"]["Text"] #註解文
 earthquake = data["Body"]["Earthquake"] #地震資訊
 
+eventtime = data["Head"]["EventID"] #地震發生時間
+mon = eventtime[4:6]
+day = eventtime[6:8]
+hou = int(eventtime[8:10])
+min = eventtime[10:12]
+if hou > 11:
+    hou -= 12
+    ampm = "午後"
+else:
+    ampm = "午前"
+hou = str(hou)
+
+a = [mon,day,hou,min]
+
+if mon[:1] == "0":
+    mon = mon.replace("0","")
+if day[:1] == "0":
+    day = day.replace("0","")
+if hou[:1] == "0":
+    hou = hou.replace("0","")
+if min[:1] == "0":
+    min = min.replace("0","")    
+
+if "震源要素更新" in title:
+    eventtime = f"{mon}月{day}日{ampm}{hou}時{min}分頃"
+else:
+    eventtime = f"{ampm}{hou}時{min}分頃"
+
 
 
 try:
     intensity = data["Body"]["Intensity"]["Observation"] #震度資訊
     pref = intensity["Pref"]
+    maxint = intensity["MaxInt"]
 except:
     intensity = ""
     pref = ""
+    maxint = ""
     print("未取得震度資訊")
 
 a = 0
@@ -118,5 +149,4 @@ for i in pref:
     if a == 1:
         break
 
-for i in cityint:
-    print(i + cityint[i])
+print(eventtime)
