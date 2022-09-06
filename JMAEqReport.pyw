@@ -57,11 +57,66 @@ def file(y=5):
     f.close()
     time.sleep(y)
 
-xml2 = requests.get(url) #取得資料
+url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%9c%87%e6%ba%90%e3%83%bb%e9%9c%87%e5%ba%a6%e3%81%ab%e9%96%a2%e3%81%99%e3%82%8b%e6%83%85%e5%a0%b1%20VXSE53/32-39_11_05_120615_VXSE53.xml" #test
+
+#xml2 = requests.get(url) #取得資料
+
+headers1 = dict() #test
+headers1["Cookie"]="__test=eb3f55df3488e2eb5ad76e961a3d8e90; _test=6c0c461aa22234658c3ed583b610179e" #test
+
+xml2 = requests.get(url,headers=headers1) #test
 
 xml2.encoding = "utf-8"
 xml2=xmltodict.parse(xml2.text) #XML轉JSON
 
 data = xml2["Report"] #資料主體
+
 title = data["Head"]["Title"] #標題
 headline = data["Head"]["Headline"]["Text"] #註解文
+earthquake = data["Body"]["Earthquake"] #地震資訊
+
+
+
+try:
+    intensity = data["Body"]["Intensity"]["Observation"] #震度資訊
+    pref = intensity["Pref"]
+except:
+    intensity = ""
+    pref = ""
+    print("未取得震度資訊")
+
+a = 0
+b = 0
+c = 0
+cityint = {}
+areaint = {}
+
+for i in pref:
+    if type(i) == str:
+        i = pref
+        a = 1
+    for j in i["Area"]:
+        if type(j) == str:
+            j = i["Area"]
+            b = 1
+        try:
+            for k in j["City"]:
+                if type(k) == str:
+                    k = j["City"]
+                    c = 1
+                cityint[k["Name"]] = k["MaxInt"]
+
+                if c == 1:
+                    break
+        except:
+            pass
+
+        areaint[j["Name"]] = j["MaxInt"]
+        
+        if b == 1:
+            break
+    if a == 1:
+        break
+
+for i in cityint:
+    print(i + cityint[i])
