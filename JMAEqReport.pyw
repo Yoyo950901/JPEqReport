@@ -13,8 +13,13 @@ import xml.etree.ElementTree as ET
 from area import *
 urllib3.disable_warnings()
 
-xml = requests.get("https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml")
+# xml = requests.get("https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml")
 xml = requests.get("https://www.data.jma.go.jp/developer/xml/feed/eqvol_l.xml") #測試用 最新1周資料
+
+# headers2 = dict() #test
+# headers2["Cookie"]="__test=eb3f55df3488e2eb5ad76e961a3d8e90; _test=6c0c461aa22234658c3ed583b610179e" #test
+
+# xml = requests.get("http://www.yoyo0901.byethost16.com/eqvol.xml",headers=headers2) #test
 xml.encoding = "utf-8"
 #取得気象庁XML(地震/火山相關)
 
@@ -113,6 +118,7 @@ data = xml2["Report"] #資料主體
 
 title = data["Head"]["Title"] #標題
 headline = data["Head"]["Headline"]["Text"] #註解文
+eventid = data["Head"]["EventID"]
 
 if "遠地地震" in title:
     datatype = "遠地地震"
@@ -124,6 +130,29 @@ elif "震度速報" in title:
     datatype = "震度速報"
 elif "震源要素更新" in title:
     datatype = "震源更新"
+
+eq2 = ""
+data2 = ""
+za = ""
+if datatype == "震源速報":
+    for j in sp.select("entry"): #搜尋地震相關的XML
+        if "VXSE51" in j.id.text:
+            url2 = j.id.text
+
+            headers1 = dict() #test
+            headers1["Cookie"]="__test=eb3f55df3488e2eb5ad76e961a3d8e90; _test=6c0c461aa22234658c3ed583b610179e" #test
+
+            xml3 = requests.get(url2,headers=headers1) #test
+
+            xml3.encoding = "utf-8"
+            xml3=xmltodict.parse(xml3.text) #XML轉JSON
+            data2 = xml3["Report"]
+
+            if data2["Head"]["EventID"] == eventid:
+                za = "a"
+                break
+if za == "":
+    data2 = ""
 
 try:
     earthquake = data["Body"]["Earthquake"] #震源資訊
@@ -155,7 +184,7 @@ except:
 
 try:
     intensity = data["Body"]["Intensity"]["Observation"] #震度資訊
-    pref = intensity["Pref"] 
+    pref = intensity["Pref"]
     maxint = intensity["MaxInt"] #最大震度
 except:
     intensity = ""
@@ -215,6 +244,8 @@ c = 0
 cityint = {}
 areaint = {}
 a = 0
+if za == "a":
+    pref = data2["Body"]["Intensity"]["Observation"]["Pref"]
 for i in pref: #將震度及名稱存到字典
     if type(i) == str:
         i = pref
@@ -248,30 +279,53 @@ for i in pref: #將震度及名稱存到字典
         break
 
 allint = ""
-if datatype == "震度速報":
+if datatype == "震度速報" or za == "a":
     allint = areaint
 elif datatype == "震源震度":
     allint = cityint
 
+a = 0
+area = ""
+lastarea = ""
+if datatype == "震度速報":
+    for y in allint.items():
+        if y[1] == maxint:
+            for i in 地域:
+                for j in i['list']:
+                    if y[0] == j:
+                        if lastarea != i['name']:
+                            area += '・' + i['name']
+                            lastarea = i['name']
+    area = area[1:]
+    area = f"　{area}地方で"
+
 far = ""
 if datatype == "遠地地震":
     far = "　海外で規模の大きな"
+
+strength = ""
+if maxint == "7" or maxint == "6+" or maxint == "6-" or maxint == "5+" or maxint == "5-":
+    strength = "強い"
+elif maxint == "4":
+    strength = "やや強い"
+
 
 print(datatype)
 eqinfo = f"震源は{loc}　深さ{dep}　マグニッチュード{mag}"
 # print(eventtime)
 # print(eqinfo)
 # print(maxint)
-#print(comcode)
+# print(comcode)
 
 
 
-output = f"{eventtime}{far}地震がありました"
+output = f"{eventtime}{area}{strength}{far}地震がありました"
 print(output)
 if datatype == "震源更新":
     output = "この地震の発生場所と規模を更新しました"
-output = eqinfo
-print(output)
+if datatype != "震度速報":
+    output = eqinfo
+    print(output)
 for i in commentcode:
     if i in comcode:
         print(commentcode[i])
