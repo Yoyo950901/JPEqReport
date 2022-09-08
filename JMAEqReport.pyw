@@ -371,3 +371,5 @@ for i in range(g):
         output = intensitylist[i] + output
         file()
         log()
+output = ""
+file(0)
