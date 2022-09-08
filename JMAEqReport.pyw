@@ -10,6 +10,7 @@ import xmltodict
 import os
 from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
+from area import *
 urllib3.disable_warnings()
 
 xml = requests.get("https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml")
@@ -62,10 +63,12 @@ def num(y):
     y = y.replace("1","１").replace("2","２").replace("3","３").replace("4","４").replace("5","５").replace("6","６").replace("7","７").replace("8","８").replace("9","９").replace("0","０")
     return y
 
-url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%9c%87%e6%ba%90%e3%83%bb%e9%9c%87%e5%ba%a6%e3%81%ab%e9%96%a2%e3%81%99%e3%82%8b%e6%83%85%e5%a0%b1%20VXSE53/32-39_11_05_120615_VXSE53.xml" #test
-url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%9c%87%e6%ba%90%e3%81%ab%e9%96%a2%e3%81%99%e3%82%8b%e6%83%85%e5%a0%b1%20VXSE52/32-35_08_06_100915_VXSE52.xml" #test
-url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%9c%87%e6%ba%90%e3%83%bb%e9%9c%87%e5%ba%a6%e3%81%ab%e9%96%a2%e3%81%99%e3%82%8b%e6%83%85%e5%a0%b1%20VXSE53/32-39_05_05_100831_VXSE53.xml" #test
-url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%a1%95%e8%91%97%e3%81%aa%e5%9c%b0%e9%9c%87%e3%81%ae%e9%9c%87%e6%ba%90%e8%a6%81%e7%b4%a0%e6%9b%b4%e6%96%b0%e3%81%ae%e3%81%8a%e7%9f%a5%e3%82%89%e3%81%9b%20VXSE61/32-35_07_09_100915_VXSE61.xml" #test
+# url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%9c%87%e6%ba%90%e3%83%bb%e9%9c%87%e5%ba%a6%e3%81%ab%e9%96%a2%e3%81%99%e3%82%8b%e6%83%85%e5%a0%b1%20VXSE53/32-39_11_05_120615_VXSE53.xml" #test
+# url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%9c%87%e6%ba%90%e3%81%ab%e9%96%a2%e3%81%99%e3%82%8b%e6%83%85%e5%a0%b1%20VXSE52/32-35_08_06_100915_VXSE52.xml" #test
+# url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%9c%87%e6%ba%90%e3%83%bb%e9%9c%87%e5%ba%a6%e3%81%ab%e9%96%a2%e3%81%99%e3%82%8b%e6%83%85%e5%a0%b1%20VXSE53/32-39_05_05_100831_VXSE53.xml" #test
+# url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%a1%95%e8%91%97%e3%81%aa%e5%9c%b0%e9%9c%87%e3%81%ae%e9%9c%87%e6%ba%90%e8%a6%81%e7%b4%a0%e6%9b%b4%e6%96%b0%e3%81%ae%e3%81%8a%e7%9f%a5%e3%82%89%e3%81%9b%20VXSE61/32-35_07_09_100915_VXSE61.xml" #test
+# url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%9c%87%e6%ba%90%e3%83%bb%e9%9c%87%e5%ba%a6%e3%81%ab%e9%96%a2%e3%81%99%e3%82%8b%e6%83%85%e5%a0%b1%20VXSE53/32-35_01_03_100806_VXSE53.xml" #test
+# url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%9c%87%e5%ba%a6%e9%80%9f%e5%a0%b1%20VXSE51/32-39_11_01_120615_VXSE51.xml" #test
 
 
 #xml2 = requests.get(url) #取得資料
@@ -95,10 +98,33 @@ commentcode = {"0211":"津波警報等を発表中です",
 "0244":"この地震で緊急地震速報を発表しましたが　震度１以上は観測されていません",
 "0245":"この地震で緊急地震速報を発表しましたが　強い揺れは観測されません"}
 
+intensitylist = {"7":"震度７",
+"6+":"震度６強",
+"6-":"震度６弱",
+"5+":"震度５強",
+"5-":"震度５弱",
+"震度５弱以上未入電":"推定５弱",
+"4":"震度４",
+"3":"震度３",
+"2":"震度２",
+"1":"震度１"}
+
 data = xml2["Report"] #資料主體
 
 title = data["Head"]["Title"] #標題
 headline = data["Head"]["Headline"]["Text"] #註解文
+
+if "遠地地震" in title:
+    datatype = "遠地地震"
+elif "震源・震度情報" in title:
+    datatype = "震源震度"
+elif "震源に関する情報" in title:
+    datatype = "震源速報"
+elif "震度速報" in title:
+    datatype = "震度速報"
+elif "震源要素更新" in title:
+    datatype = "震源更新"
+
 try:
     earthquake = data["Body"]["Earthquake"] #震源資訊
     loc = earthquake["Hypocenter"]["Area"]["Name"] #震源地
@@ -116,7 +142,7 @@ try:
             dep = "ごく浅い"
         elif "震源要素不明" in earthquake["Hypocenter"]["Area"]["jmx_eb:Coordinate"][1]["@description"]:
             dep = "不明"
-    mag = earthquake["jmx_eb:Magnitude"]["@description"].replace("Ｍ","") #規模
+    mag = earthquake["jmx_eb:Magnitude"]["@description"].replace("Ｍ","").replace("．",". ") #規模
     if "巨大地震" in mag:
         mag = "８以上"
 
@@ -175,7 +201,7 @@ if hou[:1] == "0":
 if min[:1] == "0":
     min = min.replace("0","")    
 
-if "震源要素更新" in title:
+if datatype == "震源更新":
     eventtime = f"{mon}月{day}日{ampm}{hou}時{min}分頃"
 else:
     eventtime = f"{ampm}{hou}時{min}分頃"
@@ -188,16 +214,18 @@ b = 0
 c = 0
 cityint = {}
 areaint = {}
-
+a = 0
 for i in pref: #將震度及名稱存到字典
     if type(i) == str:
         i = pref
         a = 1
+    b = 0
     for j in i["Area"]:
         if type(j) == str:
             j = i["Area"]
             b = 1
-        try:
+        if datatype == "震源震度":
+            c = 0
             for k in j["City"]:
                 if type(k) == str:
                     k = j["City"]
@@ -208,8 +236,6 @@ for i in pref: #將震度及名稱存到字典
                     cityint[k["Name"]] = k["Condition"]
                 if c == 1:
                     break
-        except:
-            pass
         
         try:
             areaint[j["Name"]] = j["MaxInt"]
@@ -221,16 +247,50 @@ for i in pref: #將震度及名稱存到字典
     if a == 1:
         break
 
-a = 0
+allint = ""
+if datatype == "震度速報":
+    allint = areaint
+elif datatype == "震源震度":
+    allint = cityint
+
+far = ""
+if datatype == "遠地地震":
+    far = "　海外で規模の大きな"
+
+print(datatype)
+eqinfo = f"震源は{loc}　深さ{dep}　マグニッチュード{mag}"
+# print(eventtime)
+# print(eqinfo)
+# print(maxint)
+#print(comcode)
+
+
+
+output = f"{eventtime}{far}地震がありました"
+print(output)
+if datatype == "震源更新":
+    output = "この地震の発生場所と規模を更新しました"
+output = eqinfo
+print(output)
 for i in commentcode:
     if i in comcode:
         print(commentcode[i])
-    a += 1
 
-
-print(eventtime)
-print(loc)
-print(dep)
-print(mag)
-print(maxint)
-print(comcode)
+for i in intensitylist:
+    output = ""
+    nextoutput = ""
+    for j in allint:
+        if i == allint[j]:
+            nextoutput = output + "　" + j
+            outputlen = 0
+            for w in nextoutput:
+                outputlen += 1
+            if outputlen > 31:
+                output = intensitylist[i] + output
+                print(output)
+                output = ""
+            output += "　" + j
+    if output == "":
+        continue
+    output = intensitylist[i] + output
+    print(output)
