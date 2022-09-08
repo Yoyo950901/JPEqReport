@@ -241,6 +241,7 @@ eventtime = num(eventtime)
 a = 0
 b = 0
 c = 0
+g = 5
 cityint = {}
 areaint = {}
 a = 0
@@ -312,39 +313,46 @@ elif maxint == "4":
 
 print(datatype)
 eqinfo = f"震源は{loc}　深さ{dep}　マグニッチュード{mag}"
-# print(eventtime)
-# print(eqinfo)
-# print(maxint)
-# print(comcode)
 
 
+if len(allint) >= 50 and len(allint) < 100:
+    g = 4
+if len(allint) >= 100 and len(allint) < 200:
+    g = 3
+if len(allint) >= 200:
+    g = 2
 
-output = f"{eventtime}{area}{strength}{far}地震がありました"
-print(output)
-if datatype == "震源更新":
-    output = "この地震の発生場所と規模を更新しました"
-if datatype != "震度速報":
-    output = eqinfo
-    print(output)
-for i in commentcode:
-    if i in comcode:
-        print(commentcode[i])
+for i in range(g):
+    output = "地震情報"
+    file(2)
+    output = f"{eventtime}{area}{strength}{far}地震がありました"
+    file()
+    if datatype == "震源更新":
+        output = "この地震の発生場所と規模を更新しました"
+        file()
+    if datatype != "震度速報":
+        output = eqinfo
+        file()
+    for i in commentcode:
+        if i in comcode:
+            output = commentcode[i]
+            file()
 
-for i in intensitylist:
-    output = ""
-    nextoutput = ""
-    for j in allint:
-        if i == allint[j]:
-            nextoutput = output + "　" + j
-            outputlen = 0
-            for w in nextoutput:
-                outputlen += 1
-            if outputlen > 31:
-                output = intensitylist[i] + output
-                print(output)
-                output = ""
-            output += "　" + j
-    if output == "":
-        continue
-    output = intensitylist[i] + output
-    print(output)
+    for i in intensitylist:
+        output = ""
+        nextoutput = ""
+        for j in allint:
+            if i == allint[j]:
+                nextoutput = output + "　" + j
+                outputlen = 0
+                for w in nextoutput:
+                    outputlen += 1
+                if outputlen > 31:
+                    output = intensitylist[i] + output
+                    file()
+                    output = ""
+                output += "　" + j
+        if output == "":
+            continue
+        output = intensitylist[i] + output
+        file()
