@@ -13,8 +13,8 @@ import xml.etree.ElementTree as ET
 from area import *
 urllib3.disable_warnings()
 
-# xml = requests.get("https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml")
-xml = requests.get("https://www.data.jma.go.jp/developer/xml/feed/eqvol_l.xml") #測試用 最新1周資料
+xml = requests.get("https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml")
+# xml = requests.get("https://www.data.jma.go.jp/developer/xml/feed/eqvol_l.xml") #測試用 最新1周資料
 
 # headers2 = dict() #test
 # headers2["Cookie"]="__test=eb3f55df3488e2eb5ad76e961a3d8e90; _test=6c0c461aa22234658c3ed583b610179e" #test
@@ -34,7 +34,7 @@ else:
 
 
 logfile = open("JMAlog.txt", encoding="utf8")
-logid1 = logfile.read()
+log1 = logfile.read()
 logfile.close
 #讀取上次情報ID
 
@@ -43,6 +43,12 @@ z = ""
 for i in sp.select("entry"): #搜尋地震相關的XML
     if "VXSE51" in i.id.text or "VXSE52" in i.id.text or "VXSE53" in i.id.text or "VXSE61" in i.id.text:
         url = i.id.text
+        log2 = i.updated.text
+        if log1 == log2: #判定情報是否為新的
+          exit()
+        f = open("JMAlog.txt", "w",encoding="utf8")
+        f.write(log2)
+        f.close()
         z = "a"
         break
 
@@ -76,12 +82,12 @@ def num(y):
 # url = "http://www.yoyo0901.byethost16.com/%e5%9c%b0%e9%9c%87%e6%83%85%e5%a0%b1/%e9%9c%87%e5%ba%a6%e9%80%9f%e5%a0%b1%20VXSE51/32-39_11_01_120615_VXSE51.xml" #test
 
 
-#xml2 = requests.get(url) #取得資料
+xml2 = requests.get(url) #取得資料
 
-headers1 = dict() #test
-headers1["Cookie"]="__test=eb3f55df3488e2eb5ad76e961a3d8e90; _test=6c0c461aa22234658c3ed583b610179e" #test
+# headers1 = dict() #test
+# headers1["Cookie"]="__test=eb3f55df3488e2eb5ad76e961a3d8e90; _test=6c0c461aa22234658c3ed583b610179e" #test
 
-xml2 = requests.get(url,headers=headers1) #test
+# xml2 = requests.get(url,headers=headers1) #test
 
 xml2.encoding = "utf-8"
 xml2=xmltodict.parse(xml2.text) #XML轉JSON
@@ -139,11 +145,11 @@ if datatype == "震源速報":
         if "VXSE51" in j.id.text:
             url2 = j.id.text
 
-            headers1 = dict() #test
-            headers1["Cookie"]="__test=eb3f55df3488e2eb5ad76e961a3d8e90; _test=6c0c461aa22234658c3ed583b610179e" #test
+            # headers1 = dict() #test
+            # headers1["Cookie"]="__test=eb3f55df3488e2eb5ad76e961a3d8e90; _test=6c0c461aa22234658c3ed583b610179e" #test
 
-            xml3 = requests.get(url2,headers=headers1) #test
-
+            # xml3 = requests.get(url2,headers=headers1) #test
+            xml3 = requests.get(url2)  
             xml3.encoding = "utf-8"
             xml3=xmltodict.parse(xml3.text) #XML轉JSON
             data2 = xml3["Report"]
@@ -305,10 +311,11 @@ if datatype == "遠地地震":
     far = "　海外で規模の大きな"
 
 strength = ""
-if maxint == "7" or maxint == "6+" or maxint == "6-" or maxint == "5+" or maxint == "5-":
-    strength = "強い"
-elif maxint == "4":
-    strength = "やや強い"
+if datatype == "震度速報":
+    if maxint == "7" or maxint == "6+" or maxint == "6-" or maxint == "5+" or maxint == "5-":
+        strength = "強い"
+    elif maxint == "4":
+        strength = "やや強い"
 
 
 print(datatype)
@@ -321,38 +328,46 @@ if len(allint) >= 100 and len(allint) < 200:
     g = 3
 if len(allint) >= 200:
     g = 2
+if datatype == "震度速報":
+    g = 20
 
 for i in range(g):
     output = "地震情報"
     file(2)
     output = f"{eventtime}{area}{strength}{far}地震がありました"
     file()
+    log()
     if datatype == "震源更新":
         output = "この地震の発生場所と規模を更新しました"
         file()
+        log()
     if datatype != "震度速報":
         output = eqinfo
         file()
+        log()
     for i in commentcode:
         if i in comcode:
             output = commentcode[i]
             file()
+            log()
 
     for i in intensitylist:
         output = ""
         nextoutput = ""
         for j in allint:
             if i == allint[j]:
-                nextoutput = output + "　" + j
+                nextoutput = output + "　" + j.replace("県","").replace("府","").replace("東京都","東京").replace("新島","新島地方").replace("鹿児島","").replace("地方","").replace("檜山","檜山地方").replace("北海道","").replace("網走","網走地方").replace("北見","北見地方").replace("紋別","紋別地方").replace("青森津軽","津軽").replace("庄内","庄内地方").replace("最上","最上地方").replace("村山","村山地方").replace("置賜","置賜地方").replace("福島会津","会津").replace("埼玉秩父","秩父地方").replace("新潟上越","新潟上越地方").replace("新潟中越","新潟中越地方").replace("新潟下越","新潟下越地方").replace("新潟佐渡","佐渡地方").replace("石川能登","能登地方").replace("石川加賀","加賀地方").replace("福井嶺北","福井嶺北地方").replace("福井嶺南","福井嶺南地方").replace("岐阜飛騨","飛騨地方").replace("静岡地方","伊豆地方").replace("兵庫淡路島","淡路島").replace("奈良","奈良県").replace("島根隠岐","隠岐").replace("予","予地方").replace("福岡福岡","福岡地方").replace("福岡北九州","北九州地方").replace("福岡筑豊","筑豊地方").replace("福岡筑後","筑後地方").replace("長崎島原半島","島原半島").replace("長崎対馬","対馬").replace("長崎壱岐","壱岐").replace("長崎五島","五島").replace("熊本阿蘇","阿蘇地方").replace("熊本熊本","熊本地方").replace("熊本球磨","球磨地方").replace("熊本天草・芦北","天草・芦北").replace("薩摩","薩摩地方").replace("大隅","大隅地方").replace("沖縄","").replace("本島","沖縄本島")
                 outputlen = 0
                 for w in nextoutput:
                     outputlen += 1
                 if outputlen > 31:
                     output = intensitylist[i] + output
                     file()
+                    log()
                     output = ""
-                output += "　" + j
+                output += "　" + j.replace("県","").replace("府","").replace("東京都","東京").replace("新島","新島地方").replace("鹿児島","").replace("地方","").replace("檜山","檜山地方").replace("北海道","").replace("網走","網走地方").replace("北見","北見地方").replace("紋別","紋別地方").replace("青森津軽","津軽").replace("庄内","庄内地方").replace("最上","最上地方").replace("村山","村山地方").replace("置賜","置賜地方").replace("福島会津","会津").replace("埼玉秩父","秩父地方").replace("新潟上越","新潟上越地方").replace("新潟中越","新潟中越地方").replace("新潟下越","新潟下越地方").replace("新潟佐渡","佐渡地方").replace("石川能登","能登地方").replace("石川加賀","加賀地方").replace("福井嶺北","福井嶺北地方").replace("福井嶺南","福井嶺南地方").replace("岐阜飛騨","飛騨地方").replace("静岡地方","伊豆地方").replace("兵庫淡路島","淡路島").replace("奈良","奈良県").replace("島根隠岐","隠岐").replace("予","予地方").replace("福岡福岡","福岡地方").replace("福岡北九州","北九州地方").replace("福岡筑豊","筑豊地方").replace("福岡筑後","筑後地方").replace("長崎島原半島","島原半島").replace("長崎対馬","対馬").replace("長崎壱岐","壱岐").replace("長崎五島","五島").replace("熊本阿蘇","阿蘇地方").replace("熊本熊本","熊本地方").replace("熊本球磨","球磨地方").replace("熊本天草・芦北","天草・芦北").replace("薩摩","薩摩地方").replace("大隅","大隅地方").replace("沖縄","").replace("本島","沖縄本島")
         if output == "":
             continue
         output = intensitylist[i] + output
         file()
+        log()
