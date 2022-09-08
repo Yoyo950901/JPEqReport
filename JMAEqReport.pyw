@@ -59,7 +59,7 @@ if z == "":
 def log():
     logfile = open('JMAlog.txt', encoding="utf8")
     log3 = logfile.read()
-    logfile.close
+    logfile.close()
     if log3 != log2:
         exit()
 
