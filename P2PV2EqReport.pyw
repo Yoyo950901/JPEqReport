@@ -4,6 +4,7 @@ import time
 import requests
 import urllib3
 from area import *
+from eqstation import *
 urllib3.disable_warnings()
 
 url = "https://api.p2pquake.net/v2/history?codes=551"
@@ -22,6 +23,7 @@ def log():
     logfile.close()
     if log3 != log2:
         exit()
+    pass
 
 def file(z="",y=5):
     print(z)
@@ -120,41 +122,15 @@ if datatype == "震源速報":
 eq_dic = {}
 for i in points:
     if datatype != "震度速報" and datatype != "震源速報":
-        if "市" in i["addr"]:
-            j = i["addr"].split("市")[0] + "市"
-            if j in eq_dic:
-                pass
-            else:
-                eq_dic[j] = i["scale"]
-
-        elif "町" in i["addr"]:
-            j = i["addr"].split("町")[0] + "町"
-            if j in eq_dic:
-                pass
-            else:
-                eq_dic[j] = i["scale"]
-
-        elif "村" in i["addr"]:
-            j = i["addr"].split("村")[0] + "村"
-            if j in eq_dic:
-                pass
-            else:
-                eq_dic[j] = i["scale"]
-
-        elif "区" in i["addr"]:
-            j = i["addr"].split("区")[0] + "区"
-            if j in eq_dic:
-                pass
-            else:
-                eq_dic[j] = i["scale"]
-
-        else:
-            if i["addr"] in eq_dic:
-                pass
-            else:
-                eq_dic[i["addr"]] = i["scale"]
+        for j in eqstation:
+            if i["addr"] == j:
+                if eqstation[j] in eq_dic:
+                    pass
+                else:
+                    eq_dic[eqstation[j]] = i["scale"]
     else:
         eq_dic[replaceint(i["addr"])] = i["scale"]
+
 
 a = 0
 area = ""
