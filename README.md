@@ -6,7 +6,7 @@
 
 ##### 下載檔案
 ###### P2P地震情報APIV2 **推薦**
-* 下載`P2PEqReport.pyw`和`area.py`
+* 下載`P2PEqReport.pyw`、`area.py`、`eqstation.py`
 * 在**同個資料夾**新增`P2PV2log.txt`及`P2PV2output.txt`
 ###### 気象庁防災情報XML
 * 下載`JMAEqReport.pyw`和`area.py`
