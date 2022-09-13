@@ -173,6 +173,8 @@ else:
     dep += "キロ"
 if mag == "-1":
     mag = "不明"
+elif "." not in mag:
+    mag += ".0" 
 mag = mag.replace(".",". ")
 
 tsunamiinfo = []
