@@ -168,7 +168,7 @@ mag = str(mag)
 if dep == "-1":
     dep = "不明"
 elif dep == "0":
-    dep = "ごく浅い"
+    dep = "　ごく浅い"
 else:
     dep += "キロ"
 if mag == "-1":
