@@ -172,7 +172,15 @@ elif dep == "0":
 else:
     dep += "キロ"
 if mag == "-1":
-    mag = "不明"
+    if datatype != "遠地地震" and dep == "10":
+        for i in data:
+            if i["earthquake"]["time"] == earthquake["time"] and i["issue"]["type"] == "震度速報":
+                mag = "８以上"
+                break
+            else:    
+                mag = "不明"
+    else:
+        mag = "不明"
 elif "." not in mag:
     mag += ".0" 
 mag = mag.replace(".",". ")
